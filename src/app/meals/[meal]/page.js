@@ -1,10 +1,40 @@
-const MealPage = ({params}) => {
-    return ( <main>
-        <h1>Meal</h1>
-        <p>This is the meal page.</p>
-        <p>Here you can find details about {params.meal}.</p>
-        <p>Feel free to explore more meals!</p>
-    </main> );
-}
- 
+import Image from "next/image";
+import styles from "./page.module.css";
+import { getMeal } from "@/lib/meals";
+import { notFound } from "next/navigation";
+
+const MealPage = ({ params }) => {
+  const meal = getMeal(params.meal);
+
+  if (!meal) {
+    notFound();
+  }
+
+  meal.instructions = meal.instructions.replace(/\n/g, "<br />");
+  return (
+    <>
+      <header className={styles.header}>
+        <div className={styles.image}>
+          <Image alt="Meal Image" src={meal.image} fill />
+        </div>
+        <div className={styles.headerText}>
+          <h1>{meal.title}</h1>
+          <p className={styles.creator}>
+            by <a href={`mailto:${meal.creator_email}`}>{meal.creator}</a>
+          </p>
+          <p className={styles.summary}>{meal.summary}</p>
+        </div>
+      </header>
+      <main>
+        <p
+          className={styles.instructions}
+          dangerouslySetInnerHTML={{
+            __html: meal.instructions,
+          }}
+        ></p>
+      </main>
+    </>
+  );
+};
+
 export default MealPage;
